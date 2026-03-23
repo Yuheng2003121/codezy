@@ -11,16 +11,17 @@ dotenv.config();
 const app = express();
 const port = process.env.PORT || 3000;
 
-app.use(cors());
-app.all("/api/auth/{*any}", toNodeHandler(auth));
-app.use(express.json());
+// Configure CORS first, before all routes
 app.use(
   cors({
-    origin: process.env.FRONTEND_URL, // Replace with your frontend's origin
-    methods: ["GET", "POST", "PUT", "DELETE"], // Specify allowed HTTP methods
+    origin: process.env.FRONTEND_URL,
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     credentials: true, // Allow credentials (cookies, authorization headers, etc.)
   }),
 );
+
+app.use(express.json());
+app.all("/api/auth/{*any}", toNodeHandler(auth));
 
 app.get("/api/me", async (req, res) => {
   const session = await auth.api.getSession({
