@@ -1,4 +1,4 @@
-"use client"
+"use client";
 
 import {
   Card,
@@ -6,51 +6,48 @@ import {
   CardDescription,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card"
-import { Input } from "@/components/ui/input"
-import { Button } from "@/components/ui/button"
-import {
-  Field,
-  FieldError,
-  FieldLabel,
-} from "@/components/ui/field"
-import { Spinner } from "@/components/ui/spinner"
-import { useRouter } from "next/navigation"
-import { useState } from "react"
-import { Controller, useForm } from "react-hook-form"
-import { zodResolver } from "@hookform/resolvers/zod"
-import { z } from "zod"
-import { authClient } from "@/lib/auth-client"
-import Link from "next/link"
-import Logo from "./ui/logo"
-import { ArrowRight, Github } from "lucide-react"
+} from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { Field, FieldError, FieldLabel } from "@/components/ui/field";
+import { Spinner } from "@/components/ui/spinner";
+import { useRouter } from "next/navigation";
+import { useState } from "react";
+import { Controller, useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
+import { authClient } from "@/lib/auth-client";
+import Link from "next/link";
+import Logo from "../ui/logo";
+import { ArrowRight, Github } from "lucide-react";
 
 const signinSchema = z.object({
   email: z.string().email("Please enter a valid email address"),
   password: z.string().min(6, "Password must be at least 6 characters"),
-})
+});
 
-type SigninFormValues = z.infer<typeof signinSchema>
+type SigninFormValues = z.infer<typeof signinSchema>;
 
 export default function SigninForm() {
-  const router = useRouter()
-  const [isLoading, setIsLoading] = useState(false)
-  const [serverError, setServerError] = useState<string | null>(null)
+  const router = useRouter();
+  const searchParams = new URLSearchParams(
+    typeof window !== "undefined" ? window.location.search : "",
+  );
+  const redirectTo = searchParams.get("redirectTo") || "/";
+  const [isLoading, setIsLoading] = useState(false);
+  const [serverError, setServerError] = useState<string | null>(null);
 
-  const {
-    control,
-    handleSubmit,
-  } = useForm<SigninFormValues>({
+  const { control, handleSubmit } = useForm<SigninFormValues>({
     resolver: zodResolver(signinSchema),
     defaultValues: {
       email: "",
       password: "",
     },
-  })
+  });
 
   const onSubmit = async (values: SigninFormValues) => {
-    setServerError(null)
-    setIsLoading(true)
+    setServerError(null);
+    setIsLoading(true);
 
     await authClient.signIn.email(
       {
@@ -59,15 +56,18 @@ export default function SigninForm() {
       },
       {
         onSuccess: () => {
-          router.push("/")
+          // 登录成功后重定向到目标页面
+          router.push(redirectTo);
         },
         onError: (ctx) => {
-          setServerError(ctx.error.message ?? "Sign in failed. Please try again.")
-          setIsLoading(false)
+          setServerError(
+            ctx.error.message ?? "Sign in failed. Please try again.",
+          );
+          setIsLoading(false);
         },
-      }
-    )
-  }
+      },
+    );
+  };
 
   return (
     <div className="w-full max-w-md px-4">

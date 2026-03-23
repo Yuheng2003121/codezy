@@ -1,0 +1,6 @@
+export { DashboardHeader } from "./header"
+export { StatsCards } from "./stats-cards"
+export { QuickActions } from "./quick-actions"
+export { RecentActivity } from "./recent-activity"
+export { AICapabilities } from "./ai-capabilities"
+export { DashboardFooter } from "./footer"

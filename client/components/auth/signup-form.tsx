@@ -1,4 +1,4 @@
-"use client"
+"use client";
 
 import {
   Card,
@@ -6,24 +6,20 @@ import {
   CardDescription,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card"
-import { Input } from "@/components/ui/input"
-import { Button } from "@/components/ui/button"
-import {
-  Field,
-  FieldError,
-  FieldLabel,
-} from "@/components/ui/field"
-import { Spinner } from "@/components/ui/spinner"
-import { useRouter } from "next/navigation"
-import { useState } from "react"
-import { Controller, useForm } from "react-hook-form"
-import { zodResolver } from "@hookform/resolvers/zod"
-import { z } from "zod"
-import { authClient } from "@/lib/auth-client"
-import { Terminal, ArrowRight, Github } from "lucide-react"
-import Link from "next/link"
-import Logo from "./ui/logo"
+} from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { Field, FieldError, FieldLabel } from "@/components/ui/field";
+import { Spinner } from "@/components/ui/spinner";
+import { useRouter } from "next/navigation";
+import { useState } from "react";
+import { Controller, useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
+import { authClient } from "@/lib/auth-client";
+import { Terminal, ArrowRight, Github } from "lucide-react";
+import Link from "next/link";
+import Logo from "../ui/logo";
 
 const signupSchema = z
   .object({
@@ -35,19 +31,20 @@ const signupSchema = z
   .refine((data) => data.password === data.confirmPassword, {
     message: "Passwords do not match",
     path: ["confirmPassword"],
-  })
+  });
 
-type SignupFormValues = z.infer<typeof signupSchema>
+type SignupFormValues = z.infer<typeof signupSchema>;
 
 export default function SignupForm() {
-  const router = useRouter()
-  const [isLoading, setIsLoading] = useState(false)
-  const [serverError, setServerError] = useState<string | null>(null)
+  const router = useRouter();
+  const searchParams = new URLSearchParams(
+    typeof window !== "undefined" ? window.location.search : "",
+  );
+  const redirectTo = searchParams.get("redirectTo") || "/";
+  const [isLoading, setIsLoading] = useState(false);
+  const [serverError, setServerError] = useState<string | null>(null);
 
-  const {
-    control,
-    handleSubmit,
-  } = useForm<SignupFormValues>({
+  const { control, handleSubmit } = useForm<SignupFormValues>({
     resolver: zodResolver(signupSchema),
     defaultValues: {
       name: "",
@@ -55,11 +52,11 @@ export default function SignupForm() {
       password: "",
       confirmPassword: "",
     },
-  })
+  });
 
   const onSubmit = async (values: SignupFormValues) => {
-    setServerError(null)
-    setIsLoading(true)
+    setServerError(null);
+    setIsLoading(true);
 
     await authClient.signUp.email(
       {
@@ -69,21 +66,24 @@ export default function SignupForm() {
       },
       {
         onSuccess: () => {
-          router.push("/")
+          // 注册成功后重定向到目标页面
+          router.push(redirectTo);
         },
         onError: (ctx) => {
-          setServerError(ctx.error.message ?? "Sign up failed. Please try again.")
-          setIsLoading(false)
+          setServerError(
+            ctx.error.message ?? "Sign up failed. Please try again.",
+          );
+          setIsLoading(false);
         },
-      }
-    )
-  }
+      },
+    );
+  };
 
   return (
     <div className="w-full max-w-md px-4">
       {/* Branding */}
       <div className="mb-8 flex flex-col items-center gap-3">
-        <Logo/>
+        <Logo />
         <div className="text-center">
           <h1 className="text-2xl font-bold tracking-tight">Coder CLI</h1>
           <p className="mt-1 text-sm text-muted-foreground">
@@ -100,7 +100,10 @@ export default function SignupForm() {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-5">
+          <form
+            onSubmit={handleSubmit(onSubmit)}
+            className="flex flex-col gap-5"
+          >
             {/* Server error */}
             {serverError && (
               <div className="rounded-lg border border-destructive/30 bg-destructive/5 px-3 py-2.5 text-sm text-destructive">
@@ -239,7 +242,12 @@ export default function SignupForm() {
             />
 
             {/* Submit */}
-            <Button type="submit" size="lg" disabled={isLoading} className="w-full mt-1">
+            <Button
+              type="submit"
+              size="lg"
+              disabled={isLoading}
+              className="w-full mt-1"
+            >
               {isLoading ? (
                 <>
                   <Spinner className="mr-2" />
@@ -273,5 +281,5 @@ export default function SignupForm() {
         <span>coder auth register</span>
       </div>
     </div>
-  )
+  );
 }

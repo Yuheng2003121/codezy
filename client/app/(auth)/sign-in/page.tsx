@@ -1,10 +1,6 @@
-import SigninForm from '@/components/signin-form'
-import React from 'react'
+"use client";
+import SigninForm from "@/components/auth/signin-form";
 
 export default function SigninPage() {
-  return (
-    <>
-      <SigninForm/>
-    </>
-  )
+  return <SigninForm />;
 }

@@ -1,5 +1,5 @@
 import { useEffect } from "react"
-import { useRouter } from "next/navigation"
+import { useRouter, usePathname, useSearchParams } from "next/navigation"
 import { authClient } from "@/lib/auth-client"
 import { Spinner } from "@/components/ui/spinner"
 
@@ -9,13 +9,22 @@ import { Spinner } from "@/components/ui/spinner"
  */
 export function useAuth() {
   const router = useRouter()
+  const pathname = usePathname()
+  const searchParams = useSearchParams()
   const { data, isPending } = authClient.useSession()
 
   useEffect(() => {
-    if (!isPending && !data?.session && !data?.user) {
-      router.push("/sign-in")
+    if (!isPending) {
+      if (!data?.session && !data?.user) {
+        // 用户未登录，重定向到登录页，并附带当前路径作为 redirectTo 参数
+        router.push(`/sign-in?redirectTo=${encodeURIComponent(pathname)}`)
+      } else if ((pathname === "/sign-in" || pathname === "/sign-up") && data?.session && data?.user) {
+        // 用户已登录但访问了登录/注册页面，重定向到 redirectTo 参数指定的页面或首页
+        const redirectTo = searchParams.get("redirectTo")
+        router.push(redirectTo || "/")
+      }
     }
-  }, [data, isPending, router])
+  }, [data, isPending, router, pathname, searchParams])
 
   return {
     user: data?.user,
