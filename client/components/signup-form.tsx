@@ -17,11 +17,11 @@ import {
 import { Spinner } from "@/components/ui/spinner"
 import { useRouter } from "next/navigation"
 import { useState } from "react"
-import { useForm } from "react-hook-form"
+import { Controller, useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { z } from "zod"
 import { authClient } from "@/lib/auth-client"
-import { Terminal, ArrowRight } from "lucide-react"
+import { Terminal, ArrowRight, Github } from "lucide-react"
 import Link from "next/link"
 import Logo from "./ui/logo"
 
@@ -45,9 +45,8 @@ export default function SignupForm() {
   const [serverError, setServerError] = useState<string | null>(null)
 
   const {
-    register,
+    control,
     handleSubmit,
-    formState: { errors },
   } = useForm<SignupFormValues>({
     resolver: zodResolver(signupSchema),
     defaultValues: {
@@ -109,69 +108,135 @@ export default function SignupForm() {
               </div>
             )}
 
+            {/* Divider */}
+            <div className="relative">
+              <div className="absolute inset-0 flex items-center">
+                <span className="w-full border-t" />
+              </div>
+              <div className="relative flex justify-center text-xs uppercase">
+                <span className="bg-background px-2 text-muted-foreground">
+                  Or continue with
+                </span>
+              </div>
+            </div>
+
+            {/* GitHub Sign Up */}
+            <Button
+              type="button"
+              variant="outline"
+              size="lg"
+              disabled={isLoading}
+              className="w-full"
+              onClick={() => {
+                authClient.signIn.social({
+                  provider: "github",
+                  callbackURL: process.env.NEXT_PUBLIC_BASE_URL,
+                });
+              }}
+            >
+              <Github className="mr-2 size-4" />
+              Continue with GitHub
+            </Button>
+
+            {/* Divider */}
+            <div className="relative">
+              <div className="absolute inset-0 flex items-center">
+                <span className="w-full border-t" />
+              </div>
+              <div className="relative flex justify-center text-xs uppercase">
+                <span className="bg-background px-2 text-muted-foreground">
+                  Or sign up with email
+                </span>
+              </div>
+            </div>
+
             {/* Name */}
-            <Field data-invalid={!!errors.name || undefined}>
-              <FieldLabel htmlFor="signup-name">Name</FieldLabel>
-              <Input
-                id="signup-name"
-                type="text"
-                placeholder="Your name"
-                autoComplete="name"
-                aria-invalid={!!errors.name}
-                {...register("name")}
-              />
-              {errors.name && (
-                <FieldError>{errors.name.message}</FieldError>
+            <Controller
+              name="name"
+              control={control}
+              render={({ field, fieldState }) => (
+                <Field data-invalid={fieldState.invalid}>
+                  <FieldLabel htmlFor={field.name}>Name</FieldLabel>
+                  <Input
+                    {...field}
+                    id={field.name}
+                    type="text"
+                    placeholder="Your name"
+                    autoComplete="name"
+                    aria-invalid={fieldState.invalid}
+                  />
+                  {fieldState.invalid && (
+                    <FieldError errors={[fieldState.error]} />
+                  )}
+                </Field>
               )}
-            </Field>
+            />
 
             {/* Email */}
-            <Field data-invalid={!!errors.email || undefined}>
-              <FieldLabel htmlFor="signup-email">Email</FieldLabel>
-              <Input
-                id="signup-email"
-                type="email"
-                placeholder="you@example.com"
-                autoComplete="email"
-                aria-invalid={!!errors.email}
-                {...register("email")}
-              />
-              {errors.email && (
-                <FieldError>{errors.email.message}</FieldError>
+            <Controller
+              name="email"
+              control={control}
+              render={({ field, fieldState }) => (
+                <Field data-invalid={fieldState.invalid}>
+                  <FieldLabel htmlFor={field.name}>Email</FieldLabel>
+                  <Input
+                    {...field}
+                    id={field.name}
+                    type="email"
+                    placeholder="you@example.com"
+                    autoComplete="email"
+                    aria-invalid={fieldState.invalid}
+                  />
+                  {fieldState.invalid && (
+                    <FieldError errors={[fieldState.error]} />
+                  )}
+                </Field>
               )}
-            </Field>
+            />
 
             {/* Password */}
-            <Field data-invalid={!!errors.password || undefined}>
-              <FieldLabel htmlFor="signup-password">Password</FieldLabel>
-              <Input
-                id="signup-password"
-                type="password"
-                placeholder="••••••••"
-                autoComplete="new-password"
-                aria-invalid={!!errors.password}
-                {...register("password")}
-              />
-              {errors.password && (
-                <FieldError>{errors.password.message}</FieldError>
+            <Controller
+              name="password"
+              control={control}
+              render={({ field, fieldState }) => (
+                <Field data-invalid={fieldState.invalid}>
+                  <FieldLabel htmlFor={field.name}>Password</FieldLabel>
+                  <Input
+                    {...field}
+                    id={field.name}
+                    type="password"
+                    placeholder="••••••••"
+                    autoComplete="new-password"
+                    aria-invalid={fieldState.invalid}
+                  />
+                  {fieldState.invalid && (
+                    <FieldError errors={[fieldState.error]} />
+                  )}
+                </Field>
               )}
-            </Field>
+            />
 
             {/* Confirm Password */}
-            <Field data-invalid={!!errors.confirmPassword || undefined}>
-              <FieldLabel htmlFor="signup-confirm-password">Confirm Password</FieldLabel>
-              <Input
-                id="signup-confirm-password"
-                type="password"
-                placeholder="••••••••"
-                autoComplete="new-password"
-                aria-invalid={!!errors.confirmPassword}
-                {...register("confirmPassword")}
-              />
-              {errors.confirmPassword && (
-                <FieldError>{errors.confirmPassword.message}</FieldError>
+            <Controller
+              name="confirmPassword"
+              control={control}
+              render={({ field, fieldState }) => (
+                <Field data-invalid={fieldState.invalid}>
+                  <FieldLabel htmlFor={field.name}>Confirm Password</FieldLabel>
+                  <Input
+                    {...field}
+                    id={field.name}
+                    type="password"
+                    placeholder="••••••••"
+                    autoComplete="new-password"
+                    aria-invalid={fieldState.invalid}
+                  />
+                  {fieldState.invalid && (
+                    <FieldError errors={[fieldState.error]} />
+                  )}
+                </Field>
               )}
-            </Field>
+            />
 
             {/* Submit */}
             <Button type="submit" size="lg" disabled={isLoading} className="w-full mt-1">

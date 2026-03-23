@@ -17,13 +17,13 @@ import {
 import { Spinner } from "@/components/ui/spinner"
 import { useRouter } from "next/navigation"
 import { useState } from "react"
-import { useForm } from "react-hook-form"
+import { Controller, useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { z } from "zod"
 import { authClient } from "@/lib/auth-client"
 import Link from "next/link"
 import Logo from "./ui/logo"
-import { ArrowRight } from "lucide-react"
+import { ArrowRight, Github } from "lucide-react"
 
 const signinSchema = z.object({
   email: z.string().email("Please enter a valid email address"),
@@ -38,9 +38,8 @@ export default function SigninForm() {
   const [serverError, setServerError] = useState<string | null>(null)
 
   const {
-    register,
+    control,
     handleSubmit,
-    formState: { errors },
   } = useForm<SigninFormValues>({
     resolver: zodResolver(signinSchema),
     defaultValues: {
@@ -102,35 +101,91 @@ export default function SigninForm() {
               </div>
             )}
 
+            {/* Divider */}
+            <div className="relative">
+              <div className="absolute inset-0 flex items-center">
+                <span className="w-full border-t" />
+              </div>
+              <div className="relative flex justify-center text-xs uppercase">
+                <span className="bg-background px-2 text-muted-foreground">
+                  Or continue with
+                </span>
+              </div>
+            </div>
+
+            {/* GitHub Sign In */}
+            <Button
+              type="button"
+              variant="outline"
+              size="lg"
+              disabled={isLoading}
+              className="w-full"
+              onClick={() => {
+                authClient.signIn.social({
+                  provider: "github",
+                  callbackURL: process.env.NEXT_PUBLIC_BASE_URL,
+                });
+              }}
+            >
+              <Github className="mr-2 size-4" />
+              Continue with GitHub
+            </Button>
+
+            {/* Divider */}
+            <div className="relative">
+              <div className="absolute inset-0 flex items-center">
+                <span className="w-full border-t" />
+              </div>
+              <div className="relative flex justify-center text-xs uppercase">
+                <span className="bg-background px-2 text-muted-foreground">
+                  Or sign in with email
+                </span>
+              </div>
+            </div>
+
             {/* Email */}
-            <Field data-invalid={!!errors.email || undefined}>
-              <FieldLabel htmlFor="signin-email">Email</FieldLabel>
-              <Input
-                id="signin-email"
-                type="email"
-                placeholder="you@example.com"
-                autoComplete="email"
-                aria-invalid={!!errors.email}
-                {...register("email")}
-              />
-              {errors.email && <FieldError>{errors.email.message}</FieldError>}
-            </Field>
+            <Controller
+              name="email"
+              control={control}
+              render={({ field, fieldState }) => (
+                <Field data-invalid={fieldState.invalid}>
+                  <FieldLabel htmlFor={field.name}>Email</FieldLabel>
+                  <Input
+                    {...field}
+                    id={field.name}
+                    type="email"
+                    placeholder="you@example.com"
+                    autoComplete="email"
+                    aria-invalid={fieldState.invalid}
+                  />
+                  {fieldState.invalid && (
+                    <FieldError errors={[fieldState.error]} />
+                  )}
+                </Field>
+              )}
+            />
 
             {/* Password */}
-            <Field data-invalid={!!errors.password || undefined}>
-              <FieldLabel htmlFor="signin-password">Password</FieldLabel>
-              <Input
-                id="signin-password"
-                type="password"
-                placeholder="••••••••"
-                autoComplete="current-password"
-                aria-invalid={!!errors.password}
-                {...register("password")}
-              />
-              {errors.password && (
-                <FieldError>{errors.password.message}</FieldError>
+            <Controller
+              name="password"
+              control={control}
+              render={({ field, fieldState }) => (
+                <Field data-invalid={fieldState.invalid}>
+                  <FieldLabel htmlFor={field.name}>Password</FieldLabel>
+                  <Input
+                    {...field}
+                    id={field.name}
+                    type="password"
+                    placeholder="••••••••"
+                    autoComplete="current-password"
+                    aria-invalid={fieldState.invalid}
+                  />
+                  {fieldState.invalid && (
+                    <FieldError errors={[fieldState.error]} />
+                  )}
+                </Field>
               )}
-            </Field>
+            />
 
             {/* Submit */}
             <Button
