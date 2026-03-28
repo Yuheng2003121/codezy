@@ -6,7 +6,7 @@ import { auth } from "./lib/auth";
 import { NotFoundError } from "./types/error";
 import { errorHandler } from "./middleware/errorHandler";
 
-dotenv.config();
+dotenv.config({quiet: true});
 
 const app = express();
 const port = process.env.PORT || 3000;

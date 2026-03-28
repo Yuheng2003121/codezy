@@ -2,6 +2,9 @@
   "compilerOptions": {
     "module": "ESNext",
     "moduleResolution": "bundler",
+    "allowImportingTsExtensions": true,
+    "noEmit": true,
+    "noImplicitAny": false,
     "target": "ES2023",
     "strict": true,
     "esModuleInterop": true,

@@ -16,10 +16,10 @@
  */
 
 import * as runtime from "@prisma/client/runtime/client"
-import type * as Prisma from "../models"
-import { type PrismaClient } from "./class"
+import type * as Prisma from "../models.ts"
+import { type PrismaClient } from "./class.ts"
 
-export type * from '../models'
+export type * from '../models.ts'
 
 export type DMMF = typeof runtime.DMMF
 
@@ -387,7 +387,8 @@ export const ModelName = {
   User: 'User',
   Session: 'Session',
   Account: 'Account',
-  Verification: 'Verification'
+  Verification: 'Verification',
+  DeviceCode: 'DeviceCode'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -403,7 +404,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "user" | "session" | "account" | "verification"
+    modelProps: "user" | "session" | "account" | "verification" | "deviceCode"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -703,6 +704,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    DeviceCode: {
+      payload: Prisma.$DeviceCodePayload<ExtArgs>
+      fields: Prisma.DeviceCodeFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.DeviceCodeFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DeviceCodePayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.DeviceCodeFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DeviceCodePayload>
+        }
+        findFirst: {
+          args: Prisma.DeviceCodeFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DeviceCodePayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.DeviceCodeFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DeviceCodePayload>
+        }
+        findMany: {
+          args: Prisma.DeviceCodeFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DeviceCodePayload>[]
+        }
+        create: {
+          args: Prisma.DeviceCodeCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DeviceCodePayload>
+        }
+        createMany: {
+          args: Prisma.DeviceCodeCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.DeviceCodeCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DeviceCodePayload>[]
+        }
+        delete: {
+          args: Prisma.DeviceCodeDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DeviceCodePayload>
+        }
+        update: {
+          args: Prisma.DeviceCodeUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DeviceCodePayload>
+        }
+        deleteMany: {
+          args: Prisma.DeviceCodeDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.DeviceCodeUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.DeviceCodeUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DeviceCodePayload>[]
+        }
+        upsert: {
+          args: Prisma.DeviceCodeUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DeviceCodePayload>
+        }
+        aggregate: {
+          args: Prisma.DeviceCodeAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateDeviceCode>
+        }
+        groupBy: {
+          args: Prisma.DeviceCodeGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.DeviceCodeGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.DeviceCodeCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.DeviceCodeCountAggregateOutputType> | number
+        }
+      }
+    }
   }
 } & {
   other: {
@@ -800,6 +875,22 @@ export const VerificationScalarFieldEnum = {
 export type VerificationScalarFieldEnum = (typeof VerificationScalarFieldEnum)[keyof typeof VerificationScalarFieldEnum]
 
 
+export const DeviceCodeScalarFieldEnum = {
+  id: 'id',
+  deviceCode: 'deviceCode',
+  userCode: 'userCode',
+  userId: 'userId',
+  expiresAt: 'expiresAt',
+  status: 'status',
+  lastPolledAt: 'lastPolledAt',
+  pollingInterval: 'pollingInterval',
+  clientId: 'clientId',
+  scope: 'scope'
+} as const
+
+export type DeviceCodeScalarFieldEnum = (typeof DeviceCodeScalarFieldEnum)[keyof typeof DeviceCodeScalarFieldEnum]
+
+
 export const SortOrder = {
   asc: 'asc',
   desc: 'desc'
@@ -876,6 +967,20 @@ export type IntFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'In
  * Reference to a field of type 'Int[]'
  */
 export type ListIntFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Int[]'>
+    
+
+
+/**
+ * Reference to a field of type 'Float'
+ */
+export type FloatFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Float'>
+    
+
+
+/**
+ * Reference to a field of type 'Float[]'
+ */
+export type ListFloatFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Float[]'>
     
 
 /**
@@ -977,6 +1082,7 @@ export type GlobalOmitConfig = {
   session?: Prisma.SessionOmit
   account?: Prisma.AccountOmit
   verification?: Prisma.VerificationOmit
+  deviceCode?: Prisma.DeviceCodeOmit
 }
 
 /* Types for Logging */
