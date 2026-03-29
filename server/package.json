@@ -4,7 +4,7 @@
   "description": "",
   "main": "src/index.js",
   "bin": {
-    "coder-cli": "./src/cli/main.ts"
+    "coder-cli": "tsx --tsconfig ./tsconfig.json ./src/cli/main.ts"
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",

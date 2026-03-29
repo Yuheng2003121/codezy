@@ -5,6 +5,7 @@ import dotenv from "dotenv";
 import { auth } from "./lib/auth";
 import { NotFoundError } from "./types/error";
 import { errorHandler } from "./middleware/errorHandler";
+import deviceRouter from "./router/device/index.ts";
 
 dotenv.config({quiet: true});
 
@@ -29,6 +30,8 @@ app.get("/api/me", async (req, res) => {
   });
   return res.json(session);
 });
+
+app.use("/device", deviceRouter);
 
 
 // 404 处理：所有未匹配路由

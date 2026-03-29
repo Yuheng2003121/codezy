@@ -34,23 +34,21 @@ const activitiesData: Activity[] = [
 function ActivityItem({ icon, title, description, time }: Activity) {
   return (
     <>
-      <div className="flex items-start gap-3">
-        <div className="p-2 rounded-md bg-primary/10 mt-1">
-          {icon}
-        </div>
+      <div className="flex items-start gap-3 py-2">
+        <div className="p-2 rounded-md bg-primary/10 mt-1">{icon}</div>
         <div className="flex-1">
           <div className="flex items-center justify-between">
             <p className="font-medium">{title}</p>
-            <Badge variant="secondary" className="text-xs">{time}</Badge>
+            <Badge variant="secondary" className="text-xs">
+              {time}
+            </Badge>
           </div>
-          <p className="text-sm text-muted-foreground mt-1">
-            {description}
-          </p>
+          <p className="text-sm text-muted-foreground mt-1">{description}</p>
         </div>
       </div>
       <Separator />
     </>
-  )
+  );
 }
 
 export function RecentActivity() {
@@ -65,7 +63,7 @@ export function RecentActivity() {
           Your latest coding sessions
         </CardDescription>
       </CardHeader>
-      <CardContent className="space-y-4">
+      <CardContent className="space-y-3">
         {activitiesData.map((activity, index) => (
           <ActivityItem key={index} {...activity} />
         ))}
