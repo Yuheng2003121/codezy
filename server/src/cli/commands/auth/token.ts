@@ -1,96 +1,84 @@
 import fs from "fs/promises";
-import path from "path";
-import os from "os";
+import { CONFIG_DIR, TOKEN_FILE } from "./login.ts";
+import chalk from "chalk";
 
-/**
- * Token 数据结构
- */
-export interface TokenData {
-  accessToken: string;
-  refreshToken?: string;
-  expiresAt: number; // Unix 时间戳
-  scope?: string;
-}
-
-/**
- * Token 元数据（用于检查状态）
- */
-export interface TokenStatus {
-  exists: boolean;
-  expired: boolean;
-  token?: TokenData;
-}
-
-// 配置目录和文件路径
-export const CONFIG_DIR = path.join(os.homedir(), ".better-auth");
-export const TOKEN_FILE = path.join(CONFIG_DIR, "token.json");
-
-/**
- * 确保配置目录存在
- */
-async function ensureConfigDir(): Promise<void> {
+export async function getStoredToken() {
   try {
-    await fs.access(CONFIG_DIR);
-  } catch {
-    await fs.mkdir(CONFIG_DIR, { recursive: true });
-  }
-}
-
-/**
- * 保存 Token 到本地文件
- */
-export async function saveToken(token: TokenData): Promise<void> {
-  await ensureConfigDir();
-  await fs.writeFile(TOKEN_FILE, JSON.stringify(token, null, 2), "utf-8");
-}
-
-/**
- * 从本地文件读取 Token
- */
-export async function getToken(): Promise<TokenData | null> {
-  try {
-    await fs.access(TOKEN_FILE);
-    const content = await fs.readFile(TOKEN_FILE, "utf-8");
-    return JSON.parse(content) as TokenData;
-  } catch {
+    const data = await fs.readFile(TOKEN_FILE, "utf-8");
+    const token = JSON.parse(data);
+    return token;
+  } catch (error) {
+    // File doesn't exist or can't be read
     return null;
   }
 }
 
-/**
- * 删除本地 Token
- */
-export async function deleteToken(): Promise<void> {
+export async function storeToken(token: any) {
+  try {
+    // Ensure config directory exists
+    await fs.mkdir(CONFIG_DIR, { recursive: true });
+
+    // Store token with metadata
+    const tokenData = {
+      access_token: token.access_token,
+      refresh_token: token.refresh_token, // Store if available
+      token_type: token.token_type || "Bearer",
+      scope: token.scope,
+      expires_at: token.expires_in
+        ? new Date(Date.now() + token.expires_in * 1000).toISOString()
+        : null,
+      created_at: new Date().toISOString(),
+    };
+
+    await fs.writeFile(TOKEN_FILE, JSON.stringify(tokenData, null, 2), "utf-8");
+    return true;
+  } catch (error: unknown) {
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    console.error(chalk.red("Failed to store token:"), errorMessage);
+    return false;
+  }
+}
+
+export async function clearStoredToken() {
   try {
     await fs.unlink(TOKEN_FILE);
-  } catch {
-    // 文件不存在时忽略错误
+    return true;
+  } catch (error) {
+    // File doesn't exist or can't be deleted
+    return false;
   }
 }
 
-/**
- * 检查 Token 状态
- */
-export async function checkTokenStatus(): Promise<TokenStatus> {
-  const token = await getToken();
+export async function isTokenExpired() {
+  const token = await getStoredToken();
+  if (!token || !token.expires_at) {
+    return true;
+  }
+
+  const expiresAt = new Date(token.expires_at);
+  const now = new Date();
+
+  // Consider expired if less than 5 minutes remaining
+  return expiresAt.getTime() - now.getTime() < 5 * 60 * 1000;
+}
+
+export async function requireAuth() {
+  const token = await getStoredToken();
 
   if (!token) {
-    return { exists: false, expired: true };
+    console.log(
+      chalk.red("❌ Not authenticated. Please run 'your-cli login' first."),
+    );
+    process.exit(1);
   }
 
-  const isExpired = Date.now() >= token.expiresAt;
+  if (await isTokenExpired()) {
+    console.log(
+      chalk.yellow("⚠️  Your session has expired. Please login again."),
+    );
+    console.log(chalk.gray("   Run: your-cli login\n"));
+    process.exit(1);
+  }
 
-  return {
-    exists: true,
-    expired: isExpired,
-    token,
-  };
-}
-
-/**
- * 检查 Token 是否有效（存在且未过期）
- */
-export async function isValidToken(): Promise<boolean> {
-  const status = await checkTokenStatus();
-  return status.exists && !status.expired;
+  return token;
 }
