@@ -1,5 +1,5 @@
 import { createOpenAI } from "@ai-sdk/openai";
-import { openaiConfig } from "../config/openai.config.ts";
+import { openaiConfig } from "@/config/openai.config.ts";
 import { LanguageModel, ModelMessage, ToolSet, generateText, streamText } from "ai";
 
 class AIService {
