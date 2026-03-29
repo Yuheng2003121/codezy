@@ -8,9 +8,11 @@ import { fileURLToPath } from "url";
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-// 强制指向 server 目录下的 .env 文件
-// 路径：src/lib/auth-client.ts -> src/lib -> src -> server 根目录
-dotenv.config({ path: path.resolve(__dirname, "../../.env") });
+// 强制指向 server 目录下的 .env 文件，并开启安静模式
+dotenv.config({ 
+  path: path.resolve(__dirname, "../../.env"),
+  quiet: true 
+});
 
 const authClient = createAuthClient({
   baseURL: process.env.BASE_URL || "http://localhost:3005",

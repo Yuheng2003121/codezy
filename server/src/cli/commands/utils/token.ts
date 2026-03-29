@@ -1,5 +1,5 @@
 import fs from "fs/promises";
-import { CONFIG_DIR, TOKEN_FILE } from "./login.ts";
+import { CONFIG_DIR, TOKEN_FILE } from "../auth/login.ts";
 import chalk from "chalk";
 
 export async function getStoredToken() {
