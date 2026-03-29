@@ -8,7 +8,7 @@ import chalk from "chalk";
 import { Command } from "commander";
 import yoctoSpinner from "yocto-spinner";
 import { logger } from "better-auth";
-import { getStoredToken, isTokenExpired, storeToken } from "./token.ts";
+import { getStoredToken, isTokenExpired, storeToken } from "../utils/token.ts";
 import authClient from "../../../lib/auth-client.ts";
 import { fileURLToPath } from "url";
 
@@ -17,10 +17,10 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 // 路径：src/cli/commands/auth/login.ts -> auth -> commands -> cli -> src -> server 根目录
 const envPath = path.resolve(__dirname, "../../../../.env");
-dotenv.config({ path: envPath });
+dotenv.config({ path: envPath, quiet: true });
 
-const URL = process.env.BASE_URL || "http://localhost:3005";
-const CLIENT_ID = process.env.GITHUB_CLIENT_ID;
+export const URL = process.env.BASE_URL || "http://localhost:3005";
+export const CLIENT_ID = process.env.GITHUB_CLIENT_ID;
 
 export const CONFIG_DIR = path.join(os.homedir(), ".coder-cli-auth");
 export const TOKEN_FILE = path.join(CONFIG_DIR, "token.json");
@@ -30,7 +30,7 @@ const mainSpinner = yoctoSpinner({ text: "", color: "cyan" });
 /**
  * 统一处理 Clack 的取消逻辑 (Esc/Ctrl+C)
  */
-function handlePromptCancel(value: string) {
+export function handlePromptCancel(value: string) {
   cancel(value);
   process.exit(0);
 }
@@ -50,16 +50,20 @@ function validateAndGetConfig(opts: any) {
 
   if (!serverUrl) {
     console.error(
-      chalk.red("Error: Missing serverUrl. Please provide it via --server-url or BASE_URL env variable."),
+      chalk.red(
+        "Error: Missing serverUrl. Please provide it via --server-url or BASE_URL env variable.",
+      ),
     );
     process.exit(1);
   }
 
   if (!clientId) {
-      console.error(
-          chalk.red("Error: Missing clientId. Please provide it via --client-id or GITHUB_CLIENT_ID env variable."),
-      );
-      process.exit(1);
+    console.error(
+      chalk.red(
+        "Error: Missing clientId. Please provide it via --client-id or GITHUB_CLIENT_ID env variable.",
+      ),
+    );
+    process.exit(1);
   }
 
   return { serverUrl, clientId };
@@ -90,7 +94,7 @@ async function checkExistingAuth() {
 async function requestDeviceAuthorization(authClient: any, clientId: string) {
   mainSpinner.text = "Requesting device authorization...";
   mainSpinner.start();
-  
+
   try {
     const { data, error } = await authClient.device.code({
       client_id: clientId,
@@ -118,7 +122,7 @@ async function requestDeviceAuthorization(authClient: any, clientId: string) {
     }
     throw err;
   } finally {
-      mainSpinner.stop();
+    mainSpinner.stop();
   }
 }
 
@@ -289,13 +293,11 @@ export async function loginAction(opts: any) {
     // 3. 检查会话
     await checkExistingAuth();
 
-
     // 初始化客户端并请求 Code， 这个authData包含user_code和device_code
     const authData = await requestDeviceAuthorization(authClient, clientId);
 
     // 5. 展示信息并引导用户
     await handleUserConfirmation(authData, authClient, clientId);
-
   } catch (error) {
     handleError(error);
   }

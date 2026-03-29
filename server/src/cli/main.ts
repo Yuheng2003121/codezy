@@ -13,6 +13,8 @@ import figlet from "figlet";
 
 import { Command } from "commander";
 import { login } from "./commands/auth/login.ts";
+import { logout } from "./commands/auth/logout.ts";
+import { userInfo } from "./commands/auth/userInfo.ts";
 
 dotenv.config({ quiet: true });
 
@@ -33,7 +35,9 @@ async function main() {
   program
     .version("0.0.1")
     .description("coder-cli - A CLI Based AI Tool")
-    .addCommand(login);
+    .addCommand(login)
+    .addCommand(logout)
+    .addCommand(userInfo)
 
   // 如果用户只输入 coder-cli 而不带子命令，显示帮助信息
   program.action(() => {
