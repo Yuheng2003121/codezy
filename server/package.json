@@ -4,7 +4,7 @@
   "description": "",
   "main": "src/index.js",
   "bin": {
-    "coder-cli": "tsx --tsconfig ./tsconfig.json ./src/cli/main.ts"
+    "coder-cli": "./bin/cli.js"
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
@@ -30,6 +30,7 @@
     "dotenv": "^17.3.1",
     "express": "^5.2.1",
     "figlet": "^1.11.0",
+    "find-up": "^8.0.0",
     "open": "^11.0.0",
     "pg": "^8.20.0",
     "prisma": "^7.5.0",
